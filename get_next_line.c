@@ -6,54 +6,83 @@
 /*   By: cemenjiv <cemenjiv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 13:31:04 by cemenjiv          #+#    #+#             */
-/*   Updated: 2021/11/01 08:58:09 by cemenjiv         ###   ########.fr       */
+/*   Updated: 2021/11/04 13:42:32 by cemenjiv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-/*
-	1- Calling GNL in loop will allow to read text available of FD oneline at a time until end of it
-	2 -Make sure file GNL behave well when read from a FILE, and when it reads from STANDARD INPUT
-	3 -Program must compile with flag gcc -Wall -Wextra -Werror -D BUFFER_SIZE = 42 <files> .c
-	4 -Use READ, MALLOC AND FREE,
-	5 -Your READ must use the BUFFER SIZE defined during compilation to read from file or from stdin.
-*/
 #include "get_next_line.h"
+
+char	*show_line(char **s, char **line)
+{
+	int		len;
+	char	*tmp;
+
+	len = 0;
+	while ((*s)[len] != '\n' && (*s)[len] != '\0')
+		len++;
+	len++;	// j'ai ajouté len ++ , car le *line doit inclure dans les caractères le \n.
+	if ((*s)[len] == '\n')
+	{
+		*line = ft_substr(*s, 0, len);
+		tmp = ft_strdup(&((*s)[len + 1]));
+		free(*s);
+		*s = tmp;
+		if ((*s)[0] == '\0')
+		{
+			free(*s);
+			*s = NULL;
+		}
+	}
+	else
+	{
+		*line = ft_strdup(*s);
+		free(*s);
+		*s = NULL;
+	}
+	//printf ("%s\n", *line); //Ne pas oublier de l'effacer 
+	return (*line);
+}
 
 char	*get_next_line(int fd)
 {
-	char	str[BUFFER_SIZE + 1];
-	char	*str1;
-	int		ret;
-	int 	i;
+	char		buf[BUFFER_SIZE + 1];
+	static char	*str[FD_SIZE];
+	char		*tmp;
+	char		*line;
+	int			ret;
 
-	i = 0;
-	if (fd == -1) // si le file descriptor est un fichier qu'on ne peut lire, retourne NULL: 
+	line = NULL;
+	if (fd < 0)
 		return (NULL);
-	str1 = alloc_mem(str);
-	while ((ret = read (fd, str1, BUFFER_SIZE) > 0))
+	while ((ret = read (fd, buf, BUFFER_SIZE)) > 0)
 	{
-		if (ret == -1) 
-			return (NULL);
-		str1[ret - 1] = '\n'; // à changer, il devrait imprimer 8 caractère, le 9eme devrait etre un saut de ligne et le 10e backslash \0'
-		str1[ret]  = '\0'; 
-		ft_putnbr(ret);
-		ft_putstr(str1);
+		buf[ret] = '\0';
+		if (str[fd] == NULL)
+			str[fd] = ft_strdup(buf);
+		else
+		{
+			tmp = ft_strjoin(str[fd], buf);
+			free(str[fd]);
+			str[fd] = tmp;
+		}
+		if (ft_strchr(str[fd], '\n'))
+			break ;
 	}
-	if (ret == 0) // Condition qui dit si fd retourne  0(fin du fichier) ou si ret == -1 en cas d'erreur)
-	{
-		ft_putstr("NO MORE CONTENT\n");
+	if (ret == 0 && str[fd] == NULL)
 		return (NULL);
-	}		
-	printf("\n");
-	ft_putnbr(ret);
-
-	return (str1);
+	if (ret < 0)
+		return (NULL);
+	return (show_line(&str[fd], &line));
 }
 
-int main()
+/*int main()
 {
-	int fd;
-
-	fd = open("42", O_RDONLY | O_CREAT | O_APPEND , S_IRUSR);
-	get_next_line(fd);
-}
+	int 		fd;
+	
+	fd = open("42.txt", O_RDONLY);
+	
+	while(get_next_line(fd))
+	{	
+		get_next_line(fd);
+	}
+}*/
