@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cemenjiv <cemenjiv@student.42.fr>          +#+  +:+       +#+        */
+/*   By: invite <invite@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 13:31:04 by cemenjiv          #+#    #+#             */
-/*   Updated: 2021/11/04 13:42:32 by cemenjiv         ###   ########.fr       */
+/*   Updated: 2021/11/08 15:19:27 by invite           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,18 +20,17 @@ char	*show_line(char **s, char **line)
 	len = 0;
 	while ((*s)[len] != '\n' && (*s)[len] != '\0')
 		len++;
-	len++;	// j'ai ajouté len ++ , car le *line doit inclure dans les caractères le \n.
-	if ((*s)[len] == '\n')
+	if ((*s)[len] == '\n' && (*s)[len + 1] != '\0')
 	{
-		*line = ft_substr(*s, 0, len);
+		*line = ft_substr(*s, 0, len + 1);
 		tmp = ft_strdup(&((*s)[len + 1]));
 		free(*s);
 		*s = tmp;
-		if ((*s)[0] == '\0')
-		{
-			free(*s);
-			*s = NULL;
-		}
+		//if ((*s)[0] == '\0')
+		//{
+			//free(*s);
+			//*s = NULL;
+		//}
 	}
 	else
 	{
@@ -39,7 +38,6 @@ char	*show_line(char **s, char **line)
 		free(*s);
 		*s = NULL;
 	}
-	//printf ("%s\n", *line); //Ne pas oublier de l'effacer 
 	return (*line);
 }
 
@@ -51,7 +49,7 @@ char	*get_next_line(int fd)
 	char		*line;
 	int			ret;
 
-	line = NULL;
+	line = NULL; //Why is this line removable?
 	if (fd < 0)
 		return (NULL);
 	while ((ret = read (fd, buf, BUFFER_SIZE)) > 0)
@@ -68,10 +66,10 @@ char	*get_next_line(int fd)
 		if (ft_strchr(str[fd], '\n'))
 			break ;
 	}
-	if (ret == 0 && str[fd] == NULL)
+	if ((ret == 0 && str[fd] == NULL) || ret < 0)
 		return (NULL);
-	if (ret < 0)
-		return (NULL);
+	//if (ret < 0)
+		//return (NULL);
 	return (show_line(&str[fd], &line));
 }
 
