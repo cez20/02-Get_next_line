@@ -1,20 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cemenjiv <cemenjiv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/10/22 13:31:04 by cemenjiv          #+#    #+#             */
-/*   Updated: 2021/11/08 17:53:26 by cemenjiv         ###   ########.fr       */
+/*   Created: 2021/11/08 17:19:53 by cemenjiv          #+#    #+#             */
+/*   Updated: 2021/11/08 17:19:56 by cemenjiv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
-// Timeout doit être mis à 300000 pour que çca fonctionne sur tous les tests.
-
-static char	*show_line(char **s, char **line)
+char	*show_line(char **s, char **line)
 {
 	int		len;
 	char	*tmp;
@@ -66,15 +64,3 @@ char	*get_next_line(int fd)
 		return (NULL);
 	return (show_line(&str[fd], &line));
 }
-
-/*int main()
-{
-	int 		fd;
-	
-	fd = open("42.txt", O_RDONLY);
-	
-	while(get_next_line(fd))
-	{	
-		get_next_line(fd);
-	}
-}*/
