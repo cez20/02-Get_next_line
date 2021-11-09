@@ -6,17 +6,19 @@
 /*   By: cemenjiv <cemenjiv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/08 17:19:53 by cemenjiv          #+#    #+#             */
-/*   Updated: 2021/11/08 17:19:56 by cemenjiv         ###   ########.fr       */
+/*   Updated: 2021/11/09 14:21:45 by cemenjiv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line_bonus.h"
+#include "get_next_line.h"
 
-char	*show_line(char **s, char **line)
+static char	*show_line(char **s, char **line, int fd)
 {
 	int		len;
 	char	*tmp;
 
+	if (fd < 0)
+		return (NULL);
 	len = 0;
 	while ((*s)[len] != '\n' && (*s)[len] != '\0')
 		len++;
@@ -44,10 +46,12 @@ char	*get_next_line(int fd)
 	char		*line;
 	int			ret;
 
-	if (fd < 0)
-		return (NULL);
-	while ((ret = read (fd, buf, BUFFER_SIZE)) > 0)
+	ret = 1;
+	while (ret > 0 && fd >= 0)
 	{
+		ret = read (fd, buf, BUFFER_SIZE);
+		if ((ret == 0 && str[fd] == NULL) || ret < 0)
+			return (NULL);
 		buf[ret] = '\0';
 		if (str[fd] == NULL)
 			str[fd] = ft_strdup(buf);
@@ -60,7 +64,5 @@ char	*get_next_line(int fd)
 		if (ft_strchr(str[fd], '\n'))
 			break ;
 	}
-	if ((ret == 0 && str[fd] == NULL) || ret < 0)
-		return (NULL);
-	return (show_line(&str[fd], &line));
+	return (show_line(&str[fd], &line, fd));
 }
