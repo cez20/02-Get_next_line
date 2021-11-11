@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line1.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cemenjiv <cemenjiv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 13:31:04 by cemenjiv          #+#    #+#             */
-/*   Updated: 2021/11/11 16:37:08 by cemenjiv         ###   ########.fr       */
+/*   Updated: 2021/11/11 16:07:11 by cemenjiv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,24 +38,11 @@ static char	*show_line(char **s, char **line, int fd)
 	return (*line);
 }
 
-static char	*join_line(char **s, char **buf, char **tmp)
-{
-	if (*s == NULL)
-		*s = ft_strdup(*buf);
-	else
-	{
-		*tmp = ft_strjoin(*s, *buf);
-		free(*s);
-		*s = *tmp;
-	}
-	free (*buf);
-	return (*s);
-}
-
+//BUFFER_SIZE = malloc(sizeof(char) * BUFFER_SIZE);
 char	*get_next_line(int fd)
 {
+	char		buf[BUFFER_SIZE + 1];
 	static char	*str[FD_SIZE];
-	char		*buf;
 	char		*tmp;
 	char		*line;
 	int			ret;
@@ -63,17 +50,46 @@ char	*get_next_line(int fd)
 	ret = 1;
 	while (ret > 0 && fd >= 0)
 	{
-		buf = malloc(sizeof(*buf) * (BUFFER_SIZE + 1));
 		ret = read (fd, buf, BUFFER_SIZE);
 		if ((ret == 0 && str[fd] == NULL) || ret < 0)
-		{
-			free(buf);
 			return (NULL);
-		}
 		buf[ret] = '\0';
-		join_line(&str[fd], &buf, &tmp);
+		if (str[fd] == NULL)
+			str[fd] = ft_strdup(buf);
+		else
+		{
+			tmp = ft_strjoin(str[fd], buf);
+			free(str[fd]);
+			str[fd] = tmp;
+		}
 		if (ft_strchr(str[fd], '\n'))
 			break ;
 	}
 	return (show_line(&str[fd], &line, fd));
+}
+
+/*int main()
+{
+	int 		fd;
+	
+	fd = open("42.txt", O_RDONLY);
+	
+	while(get_next_line(fd))
+	{	
+		get_next_line(fd);
+	}
+}*/
+
+static char	*create_line(char **str, char**buf, char **tmp)
+{
+	if (*str == NULL)
+			*str = ft_strdup(*buf);
+	else
+	{
+		*tmp = ft_strjoin(*str, *buf);
+		free(*str);
+		*str = *tmp;
+	}
+	free (*buf);
+	return (*str);
 }
