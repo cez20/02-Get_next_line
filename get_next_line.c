@@ -6,7 +6,7 @@
 /*   By: cemenjiv <cemenjiv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 13:31:04 by cemenjiv          #+#    #+#             */
-/*   Updated: 2021/11/11 16:37:08 by cemenjiv         ###   ########.fr       */
+/*   Updated: 2021/11/15 10:42:30 by cemenjiv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static char	*show_line(char **s, char **line, int fd)
 	int		len;
 	char	*tmp;
 
-	if (fd < 0)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	len = 0;
 	while ((*s)[len] != '\n' && (*s)[len] != '\0')

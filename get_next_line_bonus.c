@@ -6,18 +6,18 @@
 /*   By: cemenjiv <cemenjiv@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/08 17:19:53 by cemenjiv          #+#    #+#             */
-/*   Updated: 2021/11/09 14:21:45 by cemenjiv         ###   ########.fr       */
+/*   Updated: 2021/11/19 11:19:16 by cemenjiv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 static char	*show_line(char **s, char **line, int fd)
 {
 	int		len;
 	char	*tmp;
 
-	if (fd < 0)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	len = 0;
 	while ((*s)[len] != '\n' && (*s)[len] != '\0')
@@ -38,10 +38,24 @@ static char	*show_line(char **s, char **line, int fd)
 	return (*line);
 }
 
+static char	*join_line(char **s, char **buf, char **tmp)
+{
+	if (*s == NULL)
+		*s = ft_strdup(*buf);
+	else
+	{
+		*tmp = ft_strjoin(*s, *buf);
+		free(*s);
+		*s = *tmp;
+	}
+	free (*buf);
+	return (*s);
+}
+
 char	*get_next_line(int fd)
 {
-	char		buf[BUFFER_SIZE + 1];
 	static char	*str[FD_SIZE];
+	char		*buf;
 	char		*tmp;
 	char		*line;
 	int			ret;
@@ -49,18 +63,15 @@ char	*get_next_line(int fd)
 	ret = 1;
 	while (ret > 0 && fd >= 0)
 	{
+		buf = malloc(sizeof(*buf) * (BUFFER_SIZE + 1));
 		ret = read (fd, buf, BUFFER_SIZE);
 		if ((ret == 0 && str[fd] == NULL) || ret < 0)
-			return (NULL);
-		buf[ret] = '\0';
-		if (str[fd] == NULL)
-			str[fd] = ft_strdup(buf);
-		else
 		{
-			tmp = ft_strjoin(str[fd], buf);
-			free(str[fd]);
-			str[fd] = tmp;
+			free(buf);
+			return (NULL);
 		}
+		buf[ret] = '\0';
+		join_line(&str[fd], &buf, &tmp);
 		if (ft_strchr(str[fd], '\n'))
 			break ;
 	}
